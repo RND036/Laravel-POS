@@ -11,6 +11,7 @@ use Filament\Resources\Resource;
 use Filament\Forms\Components\TextInput;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Notifications\Notification;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
@@ -18,7 +19,9 @@ class CategoryResource extends Resource
 {
     protected static ?string $model = Category::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-tag';
+
+    protected static ?string $navigationGroup = 'Product Management';
 
     public static function form(Form $form): Form
     {
@@ -40,7 +43,15 @@ class CategoryResource extends Resource
                 //
             ])
             ->actions([
+                Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make()
+                      ->successNotification(
+                        Notification::make()
+                           ->success()
+                           ->title('Category Deleted.')
+                           ->body('Category has been deleted successfully.')
+                        )
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -59,6 +70,7 @@ class CategoryResource extends Resource
     public static function getPages(): array
     {
         return [
+            'view' => Pages\ViewCategory::route('/{record}'),
             'index' => Pages\ListCategories::route('/'),
             'create' => Pages\CreateCategory::route('/create'),
             'edit' => Pages\EditCategory::route('/{record}/edit'),
